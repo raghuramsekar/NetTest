@@ -121,7 +121,7 @@ namespace NetTest.File
                 Console.WriteLine(ex);
             }
             watch.Stop();
-            Console.WriteLine(watch.ElapsedMilliseconds);
+            Console.WriteLine("Time taken to read "+watch.ElapsedMilliseconds);
         }
 
         //Used in scenario where sequential read is needed.

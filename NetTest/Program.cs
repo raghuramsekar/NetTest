@@ -19,11 +19,18 @@ namespace NetTest
             //mmu.MMURead();
             //mmu.MMUReadBuffered();
             //mmu.NormalRead();
-            Write mmu = new Write();
+            // Ensure the file exists with the correct size
+            string filePath = @"D:\and.txt";
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                // Set the file size to at least one page (4 KB)
+                fs.SetLength(1000 * (4096 + 1));
+            }
+            MemoryMappedFile mmf = MemoryMappedFile.CreateFromFile(filePath, FileMode.OpenOrCreate, null, 0, MemoryMappedFileAccess.ReadWrite);
 
-            mmu.MMUWrite(1000, 1000);
+            Write mmu = new Write();
+            mmu.MMUWrite(1000, 1000,mmf);
             Read readMmu = new Read();
-            MemoryMappedFile mmf = MemoryMappedFile.CreateFromFile(@"D:\and.txt", FileMode.OpenOrCreate, null, 0, MemoryMappedFileAccess.ReadWrite);
             Task task1 = Task.Run(() => readMmu.MMUReadSpecific(10, 1, mmf));
             Task task2 = Task.Run(() => readMmu.MMUReadSpecific(35, 2, mmf));
             Task task3 = Task.Run(() => readMmu.MMUReadSpecific(190, 2, mmf));
@@ -31,7 +38,10 @@ namespace NetTest
             Task task5 = Task.Run(() => readMmu.MMUReadSpecific(756, 2, mmf));
             Task task6 = Task.Run(() => readMmu.MMUReadSpecific(845, 2, mmf));
             await Task.WhenAll(task1, task2, task3, task4, task5, task6);
-            Thread.Sleep(5000);
+            //Thread.Sleep(5000);
+            //mmf.Dispose();
+            Write mmm = new Write();
+            mmm.MMUWriteSpecificExisting(10, 140,mmf);
         }
     }
 }
