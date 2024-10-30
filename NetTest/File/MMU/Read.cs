@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NetTest.File
 {
-    class MMU
+    class Read
     {
         /**
          * NormalRead => 494millis - 209MB
@@ -100,10 +100,34 @@ namespace NetTest.File
             Console.WriteLine(watch.ElapsedMilliseconds);
         }
 
+        //Read Specific page 
+        public void MMUReadSpecific(int pageOffset, int noOfPages, MemoryMappedFile mmf)
+        {
+            int pageSize = Environment.SystemPageSize;  // Define page size (typically 4KB)
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            try
+            {
+                using (MemoryMappedViewAccessor accessor = mmf.CreateViewAccessor(pageOffset*pageSize,pageSize))
+                {
+                    byte[] datt = new byte[pageSize];
+                    accessor.ReadArray(0, datt, 0, pageSize);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred:");
+                Console.WriteLine(ex);
+            }
+            watch.Stop();
+            Console.WriteLine(watch.ElapsedMilliseconds);
+        }
+
         //Used in scenario where sequential read is needed.
         public void NormalRead()
         {
-            string filePath = @"D:\DataTable.json";
+            string filePath = @"D:\and.txt";
 
             // Check if the file exists
             if (!System.IO.File.Exists(filePath))
@@ -121,7 +145,7 @@ namespace NetTest.File
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        //Console.WriteLine(line);
+                        Console.WriteLine(line);
                     }
                 }
             }
